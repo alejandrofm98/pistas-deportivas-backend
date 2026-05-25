@@ -1,0 +1,493 @@
+{
+  "info": {
+    "name": "Pistas Deportivas API",
+    "description": "Colección de pruebas para la API de reserva de pistas deportivas\n\n## Configuración\n- Variable `baseUrl`: URL base de la API (default: http://localhost:8080)\n- Variable `adminToken`: se auto-asigna tras login\n- Variable `courtId`: ID de una pista existente\n- Variable `reservationId`: ID de una reserva creada",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "adminToken", "value": "" },
+    { "key": "courtId", "value": "" },
+    { "key": "reservationId", "value": "" },
+    { "key": "paymentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Autenticación del administrador",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('adminToken', json.token);",
+                  "    console.log('Token guardado:', json.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login del administrador. Devuelve JWT que se auto-guarda como adminToken."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pistas (Courts)",
+      "description": "Endpoints públicos y de admin para pistas deportivas",
+      "item": [
+        {
+          "name": "Listar pistas activas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts"]
+            }
+          }
+        },
+        {
+          "name": "Obtener pista por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courts/{{courtId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts", "{{courtId}}"]
+            }
+          }
+        },
+        {
+          "name": "Disponibilidad horaria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courts/{{courtId}}/availability?date=2026-06-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courts", "{{courtId}}", "availability"],
+              "query": [
+                { "key": "date", "value": "2026-06-01" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Listar todas las pistas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Crear pista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('courtId', json.id);",
+                  "    console.log('Pista creada, ID:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pista de Prueba\",\n  \"type\": \"TENIS\",\n  \"description\": \"Pista de pruebas creada desde Postman\",\n  \"pricePerHour\": 30.00,\n  \"imageUrl\": \"https://example.com/pista.jpg\",\n  \"maxPlayers\": 4,\n  \"amenities\": [\"Iluminación\", \"Vestuarios\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Actualizar pista",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pista de Prueba (editada)\",\n  \"type\": \"PADEL\",\n  \"description\": \"Pista actualizada\",\n  \"pricePerHour\": 35.00,\n  \"imageUrl\": \"https://example.com/pista-editada.jpg\",\n  \"maxPlayers\": 4,\n  \"amenities\": [\"Cristal\", \"Iluminación\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts/{{courtId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts", "{{courtId}}"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Toggle activar/desactivar pista",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts/{{courtId}}/toggle",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts", "{{courtId}}", "toggle"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Eliminar (desactivar) pista",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts/{{courtId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts", "{{courtId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservas (Reservations)",
+      "description": "Gestión de reservas - públicas y de administración",
+      "item": [
+        {
+          "name": "Crear reserva (público)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('reservationId', json.id);",
+                  "    console.log('Reserva creada, ID:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": \"{{courtId}}\",\n  \"customerName\": \"Juan Pérez\",\n  \"customerEmail\": \"juan@example.com\",\n  \"customerPhone\": \"+34 600 123 456\",\n  \"date\": \"2026-06-15\",\n  \"startTime\": 10,\n  \"endTime\": 12,\n  \"paymentMethod\": \"ONLINE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Listar todas las reservas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Obtener reserva por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "{{reservationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Buscar reservas por email",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/my?email=juan@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "my"],
+              "query": [
+                { "key": "email", "value": "juan@example.com" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Cancelar reserva",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "{{reservationId}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] Cambiar estado reserva",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations/{{reservationId}}/status?status=COMPLETED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations", "{{reservationId}}", "status"],
+              "query": [
+                { "key": "status", "value": "COMPLETED" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagos (Redsys)",
+      "description": "Integración con pasarela de pago Redsys",
+      "item": [
+        {
+          "name": "Iniciar pago Redsys",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('paymentUrl', json.url);",
+                  "    pm.collectionVariables.set('dsMerchantParameters', json.dsMerchantParameters);",
+                  "    console.log('URL Redsys:', json.url);",
+                  "    console.log('Parameters:', json.dsMerchantParameters);",
+                  "    console.log('Signature:', json.dsSignature);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservationId\": \"{{reservationId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "initiate"]
+            }
+          }
+        },
+        {
+          "name": "Notificación Redsys (Webhook)",
+          "description": "Simula la notificación que Redsys envía al backend tras el pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "Ds_MerchantParameters", "value": "{{dsMerchantParameters}}" },
+                { "key": "Ds_Signature", "value": "{{dsSignature}}" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/notify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "notify"]
+            }
+          }
+        },
+        {
+          "name": "Estado del pago",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Pago por reserva",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/by-reservation/{{reservationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "by-reservation", "{{reservationId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Errores y bordes",
+      "description": "Pruebas de casos borde y validación de errores",
+      "item": [
+        {
+          "name": "Login inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrong-password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Reserva sin token en endpoint protegido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "Reserva con datos inválidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": \"\",\n  \"customerName\": \"\",\n  \"customerEmail\": \"email-invalido\",\n  \"date\": null,\n  \"startTime\": 25,\n  \"endTime\": 24,\n  \"paymentMethod\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations"]
+            }
+          }
+        },
+        {
+          "name": "Crear pista sin autenticación",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pista sin auth\",\n  \"type\": \"TENIS\",\n  \"pricePerHour\": 20,\n  \"maxPlayers\": 4\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courts"]
+            }
+          }
+        },
+        {
+          "name": "Reserva solapada (misma pista, misma fecha, mismo horario)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courtId\": \"{{courtId}}\",\n  \"customerName\": \"Otro Cliente\",\n  \"customerEmail\": \"otro@example.com\",\n  \"date\": \"2026-06-15\",\n  \"startTime\": 10,\n  \"endTime\": 12,\n  \"paymentMethod\": \"ONSITE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservations"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

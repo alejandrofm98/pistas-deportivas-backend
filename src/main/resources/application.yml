@@ -1,0 +1,60 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pistas-deportivas-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sportreserve}
+    username: ${SPRING_DATASOURCE_USERNAME:sportreserve}
+    password: ${SPRING_DATASOURCE_PASSWORD:sportreserve_secret}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/seed.sql
+  flyway:
+    enabled: false
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_USERNAME:false}
+          starttls:
+            enable: ${MAIL_USERNAME:false}
+
+app:
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+  jwt:
+    secret: ${JWT_SECRET:base64-encoded-256-bit-secret-for-jwt-signing-at-least-32-chars}
+    expiration-ms: 86400000
+  redsys:
+    merchant-code: ${REDSYS_MERCHANT_CODE:999008881}
+    terminal: ${REDSYS_TERMINAL:1}
+    secret-key: ${REDSYS_SECRET_KEY:sq7HjrUOBfKmC576ILgskD5srU870gJ7}
+    url: ${REDSYS_URL:https://sis-t.redsys.es:25443/sis/realizarPago}
+    merchant-name: PistasDeportivas
+    merchant-return-url: ${APP_URL:http://localhost:4200}/payment/result
+    notify-url: ${API_URL:http://localhost:8080}/api/payments/notify
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
+
+logging:
+  level:
+    com.sportreserve: DEBUG
+    org.springframework.security: INFO

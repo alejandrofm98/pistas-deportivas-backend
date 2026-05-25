@@ -121,6 +121,13 @@ public class ReservationService {
     }
 
     @Transactional
+    public void updatePaymentStatus(UUID id, com.sportreserve.payment.PaymentStatus paymentStatus) {
+        Reservation reservation = getReservationEntity(id);
+        reservation.setPaymentStatus(paymentStatus);
+        reservationRepository.save(reservation);
+    }
+
+    @Transactional
     public void completePastReservations() {
         List<Reservation> pastReservations = reservationRepository
             .findConfirmedBeforeDate(LocalDate.now());

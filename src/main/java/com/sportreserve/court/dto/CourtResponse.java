@@ -13,6 +13,5 @@ public record CourtResponse(
     BigDecimal pricePerHour,
     String imageUrl,
     Boolean isActive,
-    Integer maxPlayers,
     List<String> amenities
 ) {}

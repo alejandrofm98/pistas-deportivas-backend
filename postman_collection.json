@@ -134,7 +134,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pista de Prueba\",\n  \"type\": \"TENIS\",\n  \"description\": \"Pista de pruebas creada desde Postman\",\n  \"pricePerHour\": 30.00,\n  \"imageUrl\": \"https://example.com/pista.jpg\",\n  \"maxPlayers\": 4,\n  \"amenities\": [\"Iluminación\", \"Vestuarios\"]\n}"
+              "raw": "{\n  \"name\": \"Pista de Prueba\",\n  \"type\": \"TENIS\",\n  \"description\": \"Pista de pruebas creada desde Postman\",\n  \"pricePerHour\": 30.00,\n  \"imageUrl\": \"https://example.com/pista.jpg\",\n  \"amenities\": [\"Iluminación\", \"Vestuarios\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/admin/courts",
@@ -153,7 +153,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pista de Prueba (editada)\",\n  \"type\": \"PADEL\",\n  \"description\": \"Pista actualizada\",\n  \"pricePerHour\": 35.00,\n  \"imageUrl\": \"https://example.com/pista-editada.jpg\",\n  \"maxPlayers\": 4,\n  \"amenities\": [\"Cristal\", \"Iluminación\"]\n}"
+              "raw": "{\n  \"name\": \"Pista de Prueba (editada)\",\n  \"type\": \"PADEL\",\n  \"description\": \"Pista actualizada\",\n  \"pricePerHour\": 35.00,\n  \"imageUrl\": \"https://example.com/pista-editada.jpg\",\n  \"amenities\": [\"Cristal\", \"Iluminación\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/admin/courts/{{courtId}}",
@@ -460,7 +460,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pista sin auth\",\n  \"type\": \"TENIS\",\n  \"pricePerHour\": 20,\n  \"maxPlayers\": 4\n}"
+              "raw": "{\n  \"name\": \"Pista sin auth\",\n  \"type\": \"TENIS\",\n  \"pricePerHour\": 20\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/admin/courts",

@@ -11,6 +11,5 @@ public record CourtRequest(
     String description,
     @NotNull @DecimalMin("0.01") BigDecimal pricePerHour,
     String imageUrl,
-    @NotNull @Min(1) Integer maxPlayers,
     List<String> amenities
 ) {}

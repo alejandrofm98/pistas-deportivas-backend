@@ -33,8 +33,6 @@ public class Court {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @Column(name = "max_players", nullable = false)
-    private Integer maxPlayers;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "court_amenities", joinColumns = @JoinColumn(name = "court_id"))
@@ -44,13 +42,12 @@ public class Court {
     public Court() {}
 
     public Court(String name, CourtType type, String description, BigDecimal pricePerHour,
-                 String imageUrl, Integer maxPlayers, List<String> amenities) {
+                 String imageUrl, List<String> amenities) {
         this.name = name;
         this.type = type;
         this.description = description;
         this.pricePerHour = pricePerHour;
         this.imageUrl = imageUrl;
-        this.maxPlayers = maxPlayers;
         this.amenities = amenities;
     }
 
@@ -68,8 +65,6 @@ public class Court {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    public Integer getMaxPlayers() { return maxPlayers; }
-    public void setMaxPlayers(Integer maxPlayers) { this.maxPlayers = maxPlayers; }
     public List<String> getAmenities() { return amenities; }
     public void setAmenities(List<String> amenities) { this.amenities = amenities; }
 

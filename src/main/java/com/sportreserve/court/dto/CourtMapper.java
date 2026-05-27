@@ -2,7 +2,6 @@ package com.sportreserve.court.dto;
 
 import com.sportreserve.court.Court;
 import org.springframework.stereotype.Component;
-import java.util.stream.Collectors;
 
 @Component
 public class CourtMapper {
@@ -16,7 +15,6 @@ public class CourtMapper {
             court.getPricePerHour(),
             court.getImageUrl(),
             court.getIsActive(),
-            court.getMaxPlayers(),
             court.getAmenities()
         );
     }
@@ -28,7 +26,6 @@ public class CourtMapper {
         court.setDescription(request.description());
         court.setPricePerHour(request.pricePerHour());
         court.setImageUrl(request.imageUrl());
-        court.setMaxPlayers(request.maxPlayers());
         court.setAmenities(request.amenities());
         court.setIsActive(true);
         return court;
@@ -40,7 +37,6 @@ public class CourtMapper {
         court.setDescription(request.description());
         court.setPricePerHour(request.pricePerHour());
         court.setImageUrl(request.imageUrl());
-        court.setMaxPlayers(request.maxPlayers());
         court.setAmenities(request.amenities());
     }
 }

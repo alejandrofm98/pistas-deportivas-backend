@@ -95,20 +95,25 @@ public class EmailService {
         String customer = escapeHtml(r.getCustomerName());
         String courtImage = r.getCourt().getImageUrl() != null && !r.getCourt().getImageUrl().isBlank()
             ? escapeHtml(r.getCourt().getImageUrl())
-            : "https://images.pexels.com/photos/1618180/pexels-photo-1618180.jpeg?auto=compress&cs=tinysrgb&w=800";
+            : "https://images.pexels.com/photos/1618180/pexels-photo-1618180.jpeg?auto=compress&cs=tinysrgb&w=400";
 
         String template = loadTemplate("templates/email/confirmation.html");
         return String.format(template,
-            logoBase64, customer, courtName, method, date, total, timeRange, courtImage, courtName, escapeHtml(senderEmail));
+            logoBase64, customer, courtName, method, date, total, timeRange, courtImage, courtName);
     }
 
     private String buildCancellationHtml(Reservation r) {
         String courtName = escapeHtml(r.getCourt().getName());
         String date = escapeHtml(formatDate(r));
         String timeRange = String.format("%02d:00 - %02d:00", r.getStartTime(), r.getEndTime());
+        String total = escapeHtml(formatMoney(r));
+        String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
+            ? "Online (tarjeta)"
+            : "Pago en local";
 
         String template = loadTemplate("templates/email/cancellation.html");
-        return String.format(template, courtName, date, timeRange);
+        return String.format(template,
+            logoBase64, courtName, method, date, total, timeRange);
     }
 
     private String formatDate(Reservation reservation) {

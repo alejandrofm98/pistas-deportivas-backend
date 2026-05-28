@@ -5,19 +5,18 @@ import com.sportreserve.court.CourtService;
 import com.sportreserve.exception.BusinessException;
 import com.sportreserve.exception.ResourceNotFoundException;
 import com.sportreserve.notification.EmailService;
-import com.sportreserve.payment.PaymentMethod;
 import com.sportreserve.payment.PaymentStatus;
 import com.sportreserve.reservation.dto.ReservationMapper;
 import com.sportreserve.reservation.dto.ReservationRequest;
 import com.sportreserve.reservation.dto.ReservationResponse;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,12 +52,6 @@ public class ReservationService {
     public Reservation getReservationEntity(UUID id) {
         return reservationRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Reservation not found: " + id));
-    }
-
-    public List<ReservationResponse> findByEmail(String email) {
-        return reservationRepository.findByCustomerEmailOrderByDateDesc(email).stream()
-            .map(reservationMapper::toResponse)
-            .collect(Collectors.toList());
     }
 
     @Transactional

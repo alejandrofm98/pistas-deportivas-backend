@@ -31,11 +31,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<List<ReservationResponse>> getByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(reservationService.findByEmail(email));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(reservationService.findById(id));

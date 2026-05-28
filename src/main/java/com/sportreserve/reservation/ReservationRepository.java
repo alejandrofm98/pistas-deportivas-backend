@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
-    List<Reservation> findByCustomerEmailOrderByDateDesc(String email);
-
     @Query("SELECT r FROM Reservation r WHERE r.court.id = :courtId AND r.date = :date AND r.status <> 'CANCELLED'")
     List<Reservation> findActiveByCourtAndDate(@Param("courtId") UUID courtId, @Param("date") LocalDate date);
 

@@ -257,23 +257,7 @@
             }
           }
         },
-        {
-          "name": "Buscar reservas por email",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/reservations/my?email=juan@example.com",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "reservations", "my"],
-              "query": [
-                { "key": "email", "value": "juan@example.com" }
-              ]
-            }
-          }
-        },
+
         {
           "name": "[ADMIN] Cancelar reserva",
           "request": {

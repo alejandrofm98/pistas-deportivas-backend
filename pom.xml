@@ -90,6 +90,13 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Brevo (formerly Sendinblue) email API -->
+        <dependency>
+            <groupId>com.brevo</groupId>
+            <artifactId>brevo</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

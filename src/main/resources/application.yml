@@ -28,7 +28,6 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
-    clean-disabled: false
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -69,3 +68,4 @@ logging:
   level:
     com.sportreserve: DEBUG
     org.springframework.security: INFO
+    org.flywaydb: DEBUG

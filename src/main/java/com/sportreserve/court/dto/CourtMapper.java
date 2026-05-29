@@ -12,7 +12,8 @@ public class CourtMapper {
             court.getName(),
             court.getType(),
             court.getDescription(),
-            court.getPricePerHour(),
+            court.getDurationMinutes(),
+            court.getPrice(),
             court.getImageUrl(),
             court.getIsActive(),
             court.getAmenities()
@@ -24,7 +25,8 @@ public class CourtMapper {
         court.setName(request.name());
         court.setType(request.type());
         court.setDescription(request.description());
-        court.setPricePerHour(request.pricePerHour());
+        court.setDurationMinutes(request.durationMinutes());
+        court.setPrice(request.price());
         court.setImageUrl(request.imageUrl());
         court.setAmenities(request.amenities());
         court.setIsActive(true);
@@ -35,7 +37,8 @@ public class CourtMapper {
         court.setName(request.name());
         court.setType(request.type());
         court.setDescription(request.description());
-        court.setPricePerHour(request.pricePerHour());
+        court.setDurationMinutes(request.durationMinutes());
+        court.setPrice(request.price());
         court.setImageUrl(request.imageUrl());
         court.setAmenities(request.amenities());
     }

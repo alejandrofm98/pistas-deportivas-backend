@@ -35,10 +35,10 @@ public class Reservation {
     private LocalDate date;
 
     @Column(name = "start_time", nullable = false)
-    private Integer startTime;
+    private Double startTime;
 
     @Column(name = "end_time", nullable = false)
-    private Integer endTime;
+    private Double endTime;
 
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
@@ -72,10 +72,10 @@ public class Reservation {
     public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
-    public Integer getStartTime() { return startTime; }
-    public void setStartTime(Integer startTime) { this.startTime = startTime; }
-    public Integer getEndTime() { return endTime; }
-    public void setEndTime(Integer endTime) { this.endTime = endTime; }
+    public Double getStartTime() { return startTime; }
+    public void setStartTime(Double startTime) { this.startTime = startTime; }
+    public Double getEndTime() { return endTime; }
+    public void setEndTime(Double endTime) { this.endTime = endTime; }
     public BigDecimal getTotalPrice() { return totalPrice; }
     public void setTotalPrice(BigDecimal totalPrice) { this.totalPrice = totalPrice; }
     public PaymentMethod getPaymentMethod() { return paymentMethod; }

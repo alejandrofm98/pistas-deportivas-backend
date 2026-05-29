@@ -1,4 +1,4 @@
--- Seed data (migrations gestionadas por Flyway V1+V2)
+-- Seed courts
 INSERT INTO courts (id, name, type, description, duration_minutes, price, image_url, is_active)
 SELECT 'c1c1c1c1-0000-4000-8000-000000000001', 'Pista Tenis Central', 'TENIS', 'Pista de tenis profesional con superficie de arcilla verde. Iluminación LED y gradas para espectadores.', 60, 25.00, 'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=800', TRUE
 WHERE NOT EXISTS (SELECT 1 FROM courts WHERE name = 'Pista Tenis Central');
@@ -23,6 +23,7 @@ INSERT INTO courts (id, name, type, description, duration_minutes, price, image_
 SELECT 'c1c1c1c1-0000-4000-8000-000000000006', 'Pista Voleibol Arena', 'VOLEIBOL', 'Pista de voleibol de arena profesional.', 60, 35.00, 'https://images.pexels.com/photos/1618180/pexels-photo-1618180.jpeg?auto=compress&cs=tinysrgb&w=800', TRUE
 WHERE NOT EXISTS (SELECT 1 FROM courts WHERE name = 'Pista Voleibol Arena');
 
+-- Seed amenities
 INSERT INTO court_amenities (court_id, amenity)
 SELECT id, unnest(ARRAY['Iluminación', 'Gradas', 'Vestuarios', 'Aparcamiento'])
 FROM courts WHERE name = 'Pista Tenis Central'

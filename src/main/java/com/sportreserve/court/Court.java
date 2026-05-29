@@ -24,8 +24,11 @@ public class Court {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "price_per_hour", nullable = false, precision = 10, scale = 2)
-    private BigDecimal pricePerHour;
+    @Column(name = "duration_minutes", nullable = false)
+    private Integer durationMinutes;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -41,12 +44,13 @@ public class Court {
 
     public Court() {}
 
-    public Court(String name, CourtType type, String description, BigDecimal pricePerHour,
-                 String imageUrl, List<String> amenities) {
+    public Court(String name, CourtType type, String description, Integer durationMinutes,
+                 BigDecimal price, String imageUrl, List<String> amenities) {
         this.name = name;
         this.type = type;
         this.description = description;
-        this.pricePerHour = pricePerHour;
+        this.durationMinutes = durationMinutes;
+        this.price = price;
         this.imageUrl = imageUrl;
         this.amenities = amenities;
     }
@@ -59,8 +63,10 @@ public class Court {
     public void setType(CourtType type) { this.type = type; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-    public BigDecimal getPricePerHour() { return pricePerHour; }
-    public void setPricePerHour(BigDecimal pricePerHour) { this.pricePerHour = pricePerHour; }
+    public Integer getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Boolean getIsActive() { return isActive; }

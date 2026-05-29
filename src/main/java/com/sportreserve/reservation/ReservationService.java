@@ -10,6 +10,7 @@ import com.sportreserve.reservation.dto.ReservationMapper;
 import com.sportreserve.reservation.dto.ReservationRequest;
 import com.sportreserve.reservation.dto.ReservationResponse;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,11 +63,17 @@ public class ReservationService {
             throw new BusinessException("Court is not active");
         }
 
-        validateTimeRange(request.startTime(), request.endTime());
-        checkOverlapping(request.courtId(), request.date(), request.startTime(), request.endTime());
+        double startTime = request.startTime();
+        double durationHours = court.getDurationMinutes() / 60.0;
+        double endTime = request.endTime() != null ? request.endTime() : startTime + durationHours;
 
-        int duration = request.endTime() - request.startTime();
-        BigDecimal totalPrice = court.getPricePerHour().multiply(BigDecimal.valueOf(duration));
+        validateTimeRange(startTime, endTime);
+        checkOverlapping(request.courtId(), request.date(), startTime, endTime);
+
+        double actualDuration = endTime - startTime;
+        BigDecimal priceMultiplier = BigDecimal.valueOf(actualDuration / durationHours);
+        BigDecimal totalPrice = court.getPrice().multiply(priceMultiplier)
+            .setScale(2, RoundingMode.HALF_UP);
 
         Reservation reservation = new Reservation();
         reservation.setCourt(court);
@@ -74,8 +81,8 @@ public class ReservationService {
         reservation.setCustomerEmail(request.customerEmail());
         reservation.setCustomerPhone(request.customerPhone());
         reservation.setDate(request.date());
-        reservation.setStartTime(request.startTime());
-        reservation.setEndTime(request.endTime());
+        reservation.setStartTime(startTime);
+        reservation.setEndTime(endTime);
         reservation.setTotalPrice(totalPrice);
         reservation.setPaymentMethod(request.paymentMethod());
         reservation.setPaymentStatus(PaymentStatus.PENDING);
@@ -130,16 +137,20 @@ public class ReservationService {
         reservationRepository.saveAll(pastReservations);
     }
 
-    private void validateTimeRange(int startTime, int endTime) {
-        if (startTime < 8 || endTime > 23) {
+    private void validateTimeRange(double startTime, double endTime) {
+        if (startTime < 8.0 || endTime > 23.0) {
             throw new BusinessException("Reservations allowed between 08:00 and 23:00");
         }
         if (startTime >= endTime) {
             throw new BusinessException("Start time must be before end time");
         }
+        // Validate that times are on half-hour boundaries
+        if (startTime % 0.5 != 0 || endTime % 0.5 != 0) {
+            throw new BusinessException("Times must be on half-hour boundaries (e.g., 8.0, 8.5, 9.0)");
+        }
     }
 
-    private void checkOverlapping(UUID courtId, LocalDate date, int startTime, int endTime) {
+    private void checkOverlapping(UUID courtId, LocalDate date, double startTime, double endTime) {
         var existing = reservationRepository.findActiveByCourtAndDate(courtId, date);
         boolean overlaps = existing.stream()
             .anyMatch(r -> startTime < r.getEndTime() && endTime > r.getStartTime());

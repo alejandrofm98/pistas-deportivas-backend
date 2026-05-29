@@ -87,7 +87,7 @@ public class EmailService {
     private String buildConfirmationHtml(Reservation r) {
         String courtName = escapeHtml(r.getCourt().getName());
         String date = escapeHtml(formatDate(r));
-        String timeRange = String.format("%02d:00 - %02d:00", r.getStartTime(), r.getEndTime());
+        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
         String total = escapeHtml(formatMoney(r));
         String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
             ? "Online (tarjeta)"
@@ -105,7 +105,7 @@ public class EmailService {
     private String buildCancellationHtml(Reservation r) {
         String courtName = escapeHtml(r.getCourt().getName());
         String date = escapeHtml(formatDate(r));
-        String timeRange = String.format("%02d:00 - %02d:00", r.getStartTime(), r.getEndTime());
+        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
         String total = escapeHtml(formatMoney(r));
         String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
             ? "Online (tarjeta)"
@@ -118,6 +118,16 @@ public class EmailService {
 
     private String formatDate(Reservation reservation) {
         return reservation.getDate().format(SPANISH_DATE);
+    }
+
+    private String formatTimeRange(double startTime, double endTime) {
+        return String.format("%s - %s", formatTime(startTime), formatTime(endTime));
+    }
+
+    private String formatTime(double time) {
+        int hours = (int) time;
+        int minutes = (int) Math.round((time - hours) * 60);
+        return String.format("%02d:%02d", hours, minutes);
     }
 
     private String formatMoney(Reservation reservation) {

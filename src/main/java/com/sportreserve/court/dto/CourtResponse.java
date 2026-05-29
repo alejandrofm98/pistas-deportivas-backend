@@ -10,7 +10,8 @@ public record CourtResponse(
     String name,
     CourtType type,
     String description,
-    BigDecimal pricePerHour,
+    Integer durationMinutes,
+    BigDecimal price,
     String imageUrl,
     Boolean isActive,
     List<String> amenities

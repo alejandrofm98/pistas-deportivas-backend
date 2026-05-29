@@ -68,4 +68,3 @@ logging:
   level:
     com.sportreserve: DEBUG
     org.springframework.security: INFO
-    org.flywaydb: DEBUG

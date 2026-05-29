@@ -6,7 +6,16 @@ ALTER TABLE courts ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;
 ALTER TABLE courts ADD COLUMN IF NOT EXISTS price DECIMAL(10,2);
 
 -- Migrate data from old column if it still exists
-UPDATE courts SET duration_minutes = 60, price = price_per_hour WHERE price_per_hour IS NOT NULL AND duration_minutes IS NULL;
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'courts' AND column_name = 'price_per_hour'
+    ) THEN
+        UPDATE courts SET duration_minutes = 60, price = price_per_hour
+        WHERE price_per_hour IS NOT NULL AND duration_minutes IS NULL;
+    END IF;
+END $$;
 
 ALTER TABLE courts ALTER COLUMN duration_minutes SET NOT NULL;
 ALTER TABLE courts ALTER COLUMN price SET NOT NULL;

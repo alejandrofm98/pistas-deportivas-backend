@@ -4,6 +4,12 @@ services:
     restart: unless-stopped
     expose:
       - "8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pistas-backend.rule=Host(`api.pistasvalleperdido.es`)"
+      - "traefik.http.routers.pistas-backend.entrypoints=websecure"
+      - "traefik.http.routers.pistas-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pistas-backend.loadbalancer.server.port=8080"
     environment:
       - SPRING_DATASOURCE_URL
       - SPRING_DATASOURCE_USERNAME

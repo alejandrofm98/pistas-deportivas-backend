@@ -24,6 +24,14 @@ services:
       - BREVO_SENDER_EMAIL
     volumes:
       - uploads_data:/app/uploads
+    networks:
+      - default
+      - dokploy-network
 
 volumes:
   uploads_data:
+
+networks:
+  default: {}
+  dokploy-network:
+    external: true

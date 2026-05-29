@@ -1,6 +1,5 @@
 server:
   port: 8080
-
 spring:
   servlet:
     multipart:
@@ -15,8 +14,9 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: false
+    defer-datasource-initialization: false
     properties:
       hibernate:
         format_sql: true
@@ -29,7 +29,7 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
-    validate-on-migrate: true
+    validate-on-migrate: false
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -41,7 +41,6 @@ spring:
           auth: ${MAIL_USERNAME:false}
           starttls:
             enable: ${MAIL_USERNAME:false}
-
 app:
   upload:
     dir: ${UPLOAD_DIR:./uploads}
@@ -65,8 +64,8 @@ app:
     api-key: ${BREVO_API_KEY:}
     sender-name: Pistas El Valle
     sender-email: ${BREVO_SENDER_EMAIL:}
-
 logging:
   level:
     com.sportreserve: DEBUG
     org.springframework.security: INFO
+    org.flywaydb: DEBUG

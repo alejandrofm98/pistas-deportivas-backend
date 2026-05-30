@@ -17,10 +17,8 @@ import brevoModel.SendSmtpEmailSender;
 import brevoModel.SendSmtpEmailTo;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +32,6 @@ public class EmailService {
     private final String apiKey;
     private final String senderName;
     private final String senderEmail;
-    private final String logoBase64;
 
     public EmailService(@Value("${app.brevo.api-key:}") String apiKey,
                         @Value("${app.brevo.sender-name:Pistas El Valle}") String senderName,
@@ -42,7 +39,6 @@ public class EmailService {
         this.apiKey = apiKey;
         this.senderName = senderName;
         this.senderEmail = senderEmail;
-        this.logoBase64 = loadLogoAsDataUri();
     }
 
     public void sendReservationConfirmation(Reservation reservation) {
@@ -85,35 +81,32 @@ public class EmailService {
     }
 
     private String buildConfirmationHtml(Reservation r) {
+        String customer = escapeHtml(r.getCustomerName());
         String courtName = escapeHtml(r.getCourt().getName());
-        String date = escapeHtml(formatDate(r));
-        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
-        String total = escapeHtml(formatMoney(r));
         String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
             ? "Online (tarjeta)"
             : "Pago en local";
-        String customer = escapeHtml(r.getCustomerName());
-        String courtImage = r.getCourt().getImageUrl() != null && !r.getCourt().getImageUrl().isBlank()
-            ? escapeHtml(r.getCourt().getImageUrl())
-            : "https://images.pexels.com/photos/1618180/pexels-photo-1618180.jpeg?auto=compress&cs=tinysrgb&w=400";
+        String date = escapeHtml(formatDate(r));
+        String total = escapeHtml(formatMoney(r));
+        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
 
         String template = loadTemplate("templates/email/confirmation.html");
         return String.format(template,
-            logoBase64, customer, courtName, method, date, total, timeRange, courtImage, courtName);
+            customer, courtName, method, date, total, timeRange);
     }
 
     private String buildCancellationHtml(Reservation r) {
         String courtName = escapeHtml(r.getCourt().getName());
-        String date = escapeHtml(formatDate(r));
-        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
-        String total = escapeHtml(formatMoney(r));
         String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
             ? "Online (tarjeta)"
             : "Pago en local";
+        String date = escapeHtml(formatDate(r));
+        String total = escapeHtml(formatMoney(r));
+        String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
 
         String template = loadTemplate("templates/email/cancellation.html");
         return String.format(template,
-            logoBase64, courtName, method, date, total, timeRange);
+            courtName, method, date, total, timeRange);
     }
 
     private String formatDate(Reservation reservation) {
@@ -140,20 +133,6 @@ public class EmailService {
             return resource.getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load email template: " + path, e);
-        }
-    }
-
-    private String loadLogoAsDataUri() {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("static/icono.webp")) {
-            if (is == null) {
-                log.warn("Logo not found at static/icono.webp");
-                return "";
-            }
-            byte[] bytes = is.readAllBytes();
-            return "data:image/webp;base64," + Base64.getEncoder().encodeToString(bytes);
-        } catch (IOException e) {
-            log.warn("Could not load logo: {}", e.getMessage());
-            return "";
         }
     }
 

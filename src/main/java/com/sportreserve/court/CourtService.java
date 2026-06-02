@@ -98,8 +98,12 @@ public class CourtService {
     @Transactional
     public void delete(UUID id) {
         Court court = getCourtEntity(id);
-        court.setIsActive(false);
-        courtRepository.save(court);
+        long reservationCount = reservationRepository.countByCourtId(id);
+        if (reservationCount > 0) {
+            throw new BusinessException("No se puede eliminar: tiene reservas activas");
+        }
+        court.getAmenities().clear();
+        courtRepository.delete(court);
     }
 
     @Transactional

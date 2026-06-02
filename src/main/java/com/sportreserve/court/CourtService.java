@@ -58,9 +58,9 @@ public class CourtService {
         Court court = getCourtEntity(courtId);
         var reservations = reservationRepository.findActiveByCourtAndDate(courtId, date);
 
-        var slots = IntStream.rangeClosed(16, 46) // 8.0 to 23.0 in half-hour increments
+        var slots = IntStream.rangeClosed(14, 48) // 7.0 to 24.0 in half-hour increments
             .mapToDouble(i -> i / 2.0)
-            .filter(time -> time <= 23.0)
+            .filter(time -> time <= 24.0)
             .mapToObj(time -> {
                 boolean available = reservations.stream()
                     .noneMatch(r -> time >= r.getStartTime() && time < r.getEndTime());

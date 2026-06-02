@@ -48,7 +48,7 @@ app:
     allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
   brevo:
     api-key: ${BREVO_API_KEY:}
-    sender-name: Pistas El Valle
+    sender-name: Pistas El Valle Perdido
     sender-email: ${BREVO_SENDER_EMAIL:}
 logging:
   level:

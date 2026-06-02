@@ -138,15 +138,15 @@ public class ReservationService {
     }
 
     private void validateTimeRange(double startTime, double endTime) {
-        if (startTime < 8.0 || endTime > 23.0) {
-            throw new BusinessException("Reservations allowed between 08:00 and 23:00");
+        if (startTime < 7.0 || endTime > 24.0) {
+            throw new BusinessException("Reservations allowed between 07:00 and 24:00");
         }
         if (startTime >= endTime) {
             throw new BusinessException("Start time must be before end time");
         }
         // Validate that times are on half-hour boundaries
         if (startTime % 0.5 != 0 || endTime % 0.5 != 0) {
-            throw new BusinessException("Times must be on half-hour boundaries (e.g., 8.0, 8.5, 9.0)");
+            throw new BusinessException("Times must be on half-hour boundaries (e.g., 7.0, 7.5, 8.0)");
         }
     }
 

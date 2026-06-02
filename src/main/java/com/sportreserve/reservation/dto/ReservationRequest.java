@@ -11,7 +11,7 @@ public record ReservationRequest(
     @NotBlank @Email String customerEmail,
     String customerPhone,
     @NotNull LocalDate date,
-    @NotNull @Min(8) @Max(22) Double startTime,
+    @NotNull @Min(7) @Max(23) Double startTime,
     @NotNull PaymentMethod paymentMethod,
     Double endTime
 ) {}

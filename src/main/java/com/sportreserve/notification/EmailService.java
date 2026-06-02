@@ -42,14 +42,14 @@ public class EmailService {
     }
 
     public void sendReservationConfirmation(Reservation reservation) {
-        String subject = "Reserva confirmada - Pistas El Valle";
+        String subject = "Reserva confirmada - Pistas El Valle Perdido";
         String html = buildConfirmationHtml(reservation);
         sendEmail(reservation.getCustomerEmail(), subject, html);
         log.info("Confirmation email sent to {}", reservation.getCustomerEmail());
     }
 
     public void sendCancellationNotification(Reservation reservation) {
-        String subject = "Reserva cancelada - Pistas El Valle";
+        String subject = "Reserva cancelada - Pistas El Valle Perdido";
         String html = buildCancellationHtml(reservation);
         sendEmail(reservation.getCustomerEmail(), subject, html);
         log.info("Cancellation email sent to {}", reservation.getCustomerEmail());

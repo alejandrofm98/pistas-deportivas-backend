@@ -14,4 +14,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT r FROM Reservation r WHERE r.date < :today AND r.status = 'CONFIRMED'")
     List<Reservation> findConfirmedBeforeDate(@Param("today") LocalDate today);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.court.id = :courtId")
+    long countByCourtId(@Param("courtId") UUID courtId);
 }

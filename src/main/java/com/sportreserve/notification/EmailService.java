@@ -83,9 +83,7 @@ public class EmailService {
     private String buildConfirmationHtml(Reservation r) {
         String customer = escapeHtml(r.getCustomerName());
         String courtName = escapeHtml(r.getCourt().getName());
-        String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
-            ? "Online (tarjeta)"
-            : "Pago en local";
+        String method = formatPaymentMethod(r);
         String date = escapeHtml(formatDate(r));
         String total = escapeHtml(formatMoney(r));
         String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
@@ -97,9 +95,7 @@ public class EmailService {
 
     private String buildCancellationHtml(Reservation r) {
         String courtName = escapeHtml(r.getCourt().getName());
-        String method = r.getPaymentMethod() == com.sportreserve.payment.PaymentMethod.ONLINE
-            ? "Online (tarjeta)"
-            : "Pago en local";
+        String method = formatPaymentMethod(r);
         String date = escapeHtml(formatDate(r));
         String total = escapeHtml(formatMoney(r));
         String timeRange = formatTimeRange(r.getStartTime(), r.getEndTime());
@@ -125,6 +121,14 @@ public class EmailService {
 
     private String formatMoney(Reservation reservation) {
         return String.format(Locale.forLanguageTag("es-ES"), "%.2f", reservation.getTotalPrice());
+    }
+
+    private String formatPaymentMethod(Reservation reservation) {
+        return switch (reservation.getPaymentMethod()) {
+            case ONLINE -> "Online (tarjeta)";
+            case BIZUM -> "Bizum";
+            case ONSITE -> "Pago en local";
+        };
     }
 
     private String loadTemplate(String path) {

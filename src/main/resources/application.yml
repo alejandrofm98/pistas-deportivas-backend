@@ -37,9 +37,10 @@ app:
     secret: ${JWT_SECRET:base64-encoded-256-bit-secret-for-jwt-signing-at-least-32-chars}
     expiration-ms: 86400000
   redsys:
-    merchant-code: ${REDSYS_MERCHANT_CODE:999008881}
+    merchant-code: ${REDSYS_MERCHANT_CODE:}
     terminal: ${REDSYS_TERMINAL:1}
-    secret-key: ${REDSYS_SECRET_KEY:sq7HjrUOBfKmC576ILgskD5srU870gJ7}
+    secret-key: ${REDSYS_SECRET_KEY:}
+    currency: ${REDSYS_CURRENCY:978}
     url: ${REDSYS_URL:https://sis-t.redsys.es:25443/sis/realizarPago}
     merchant-name: PistasDeportivas
     merchant-return-url: ${APP_URL:http://localhost:4200}/payment/result

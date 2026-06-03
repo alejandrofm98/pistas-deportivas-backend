@@ -4,12 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
-    @Query("SELECT r FROM Reservation r WHERE r.court.id = :courtId AND r.date = :date AND r.status <> 'CANCELLED'")
+    @Query("SELECT r FROM Reservation r WHERE r.court.id = :courtId AND r.date = :date AND r.status NOT IN ('CANCELLED', 'PENDING_PAYMENT')")
     List<Reservation> findActiveByCourtAndDate(@Param("courtId") UUID courtId, @Param("date") LocalDate date);
 
     @Query("SELECT r FROM Reservation r WHERE r.date < :today AND r.status = 'CONFIRMED'")
@@ -17,4 +18,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.court.id = :courtId")
     long countByCourtId(@Param("courtId") UUID courtId);
+
+    List<Reservation> findByBookingGroup(UUID bookingGroup);
+
+    List<Reservation> findByStatusAndCreatedAtBefore(ReservationStatus status, LocalDateTime before);
 }

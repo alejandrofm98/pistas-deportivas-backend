@@ -1,5 +1,5 @@
 package com.sportreserve.reservation;
 
 public enum ReservationStatus {
-    CONFIRMED, CANCELLED, COMPLETED
+    PENDING_PAYMENT, CONFIRMED, CANCELLED, COMPLETED
 }

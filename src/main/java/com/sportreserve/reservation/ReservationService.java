@@ -90,7 +90,7 @@ public class ReservationService {
         reservation.setPaymentStatus(PaymentStatus.PENDING);
         reservation.setBookingGroup(request.bookingGroup());
 
-        if (request.paymentMethod() == PaymentMethod.ONLINE) {
+        if (request.paymentMethod() == PaymentMethod.ONLINE || request.paymentMethod() == PaymentMethod.BIZUM) {
             reservation.setStatus(ReservationStatus.PENDING_PAYMENT);
         } else {
             reservation.setStatus(ReservationStatus.CONFIRMED);

@@ -86,6 +86,13 @@ public class RedsysService {
         params.put("DS_MERCHANT_MERCHANTNAME", merchantName);
         params.put("DS_MERCHANT_TITULAR", reservation.getCustomerName());
         params.put("DS_MERCHANT_PRODUCTDESCRIPTION", "Reserva: " + reservation.getCourt().getName());
+        if (reservation.getPaymentMethod() == PaymentMethod.BIZUM) {
+            params.put("DS_MERCHANT_PAYMETHODS", "z");
+            String bizumPhone = normalizeBizumPhone(reservation.getCustomerPhone());
+            if (!bizumPhone.isBlank()) {
+                params.put("DS_MERCHANT_BIZUM_MOBILENUMBER", bizumPhone);
+            }
+        }
 
         try {
             String jsonParams = objectMapper.writeValueAsString(params);
@@ -232,6 +239,23 @@ public class RedsysService {
 
     private String normalizeSignature(String signature) {
         return signature == null ? "" : signature.replace('+', '-').replace('/', '_').replace("=", "");
+    }
+
+    private String normalizeBizumPhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+        String digits = phone.replaceAll("\\D", "");
+        if (digits.startsWith("0034") && digits.length() == 13) {
+            return digits.substring(2);
+        }
+        if (digits.startsWith("34") && digits.length() == 11) {
+            return digits;
+        }
+        if (digits.length() == 9) {
+            return "34" + digits;
+        }
+        return digits;
     }
 
     public String getTerminal() {

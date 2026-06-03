@@ -20,8 +20,12 @@ services:
       - REDSYS_MERCHANT_CODE
       - REDSYS_TERMINAL
       - REDSYS_SECRET_KEY
+      - REDSYS_CURRENCY
       - REDSYS_URL
       - REDSYS_MERCHANT_URL
+      - APP_URL
+      - API_URL
+      - CORS_ORIGINS
       - MAIL_HOST
       - MAIL_PORT
       - MAIL_USERNAME

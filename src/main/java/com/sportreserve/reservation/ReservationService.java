@@ -5,6 +5,7 @@ import com.sportreserve.court.CourtService;
 import com.sportreserve.exception.BusinessException;
 import com.sportreserve.exception.ResourceNotFoundException;
 import com.sportreserve.notification.EmailService;
+import com.sportreserve.payment.PaymentMethod;
 import com.sportreserve.payment.PaymentStatus;
 import com.sportreserve.reservation.dto.ReservationMapper;
 import com.sportreserve.reservation.dto.ReservationRequest;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,14 +88,36 @@ public class ReservationService {
         reservation.setTotalPrice(totalPrice);
         reservation.setPaymentMethod(request.paymentMethod());
         reservation.setPaymentStatus(PaymentStatus.PENDING);
-        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservation.setBookingGroup(request.bookingGroup());
+
+        if (request.paymentMethod() == PaymentMethod.ONLINE) {
+            reservation.setStatus(ReservationStatus.PENDING_PAYMENT);
+        } else {
+            reservation.setStatus(ReservationStatus.CONFIRMED);
+        }
+
         reservation.setCreatedAt(LocalDateTime.now());
 
         reservation = reservationRepository.save(reservation);
 
-        emailService.sendReservationConfirmation(reservation);
+        if (request.paymentMethod() == PaymentMethod.ONSITE) {
+            emailService.sendReservationConfirmation(reservation);
+        }
 
         return reservationMapper.toResponse(reservation);
+    }
+
+    @Transactional
+    public void confirmByBookingGroup(UUID bookingGroup, String redsysTransactionId) {
+        List<Reservation> reservations = reservationRepository.findByBookingGroup(bookingGroup);
+        for (Reservation reservation : reservations) {
+            if (reservation.getStatus() == ReservationStatus.PENDING_PAYMENT) {
+                reservation.setStatus(ReservationStatus.CONFIRMED);
+                reservation.setPaymentStatus(PaymentStatus.PAID);
+                reservationRepository.save(reservation);
+                emailService.sendReservationConfirmation(reservation);
+            }
+        }
     }
 
     @Transactional
@@ -135,6 +159,20 @@ public class ReservationService {
             r.setStatus(ReservationStatus.COMPLETED);
         }
         reservationRepository.saveAll(pastReservations);
+    }
+
+    @Scheduled(fixedDelay = 5 * 60 * 1000, initialDelay = 60 * 1000)
+    @Transactional
+    public void cleanupAbandonedPaymentReservations() {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(15);
+        List<Reservation> abandoned = reservationRepository
+            .findByStatusAndCreatedAtBefore(ReservationStatus.PENDING_PAYMENT, threshold);
+        if (!abandoned.isEmpty()) {
+            for (Reservation r : abandoned) {
+                r.setStatus(ReservationStatus.CANCELLED);
+            }
+            reservationRepository.saveAll(abandoned);
+        }
     }
 
     private void validateTimeRange(double startTime, double endTime) {

@@ -131,14 +131,6 @@ public class EmailService {
         return String.format(Locale.forLanguageTag("es-ES"), "%.2f", reservation.getTotalPrice());
     }
 
-    private String formatPaymentMethod(Reservation reservation) {
-        return switch (reservation.getPaymentMethod()) {
-            case ONLINE -> "Online (tarjeta)";
-            case BIZUM -> "Bizum";
-            case ONSITE -> "Pago en local";
-        };
-    }
-
     private String loadTemplate(String path) {
         try {
             ClassPathResource resource = new ClassPathResource(path);

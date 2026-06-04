@@ -13,6 +13,5 @@ public record ReservationRequest(
     @NotNull LocalDate date,
     @NotNull @Min(7) @Max(23) Double startTime,
     @NotNull PaymentMethod paymentMethod,
-    Double endTime,
-    UUID bookingGroup
+    Double endTime
 ) {}

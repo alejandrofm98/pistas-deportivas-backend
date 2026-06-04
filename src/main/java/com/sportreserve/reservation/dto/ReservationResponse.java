@@ -21,7 +21,6 @@ public record ReservationResponse(
     BigDecimal totalPrice,
     PaymentMethod paymentMethod,
     PaymentStatus paymentStatus,
-    UUID bookingGroup,
     ReservationStatus status,
     LocalDateTime createdAt
 ) {}

@@ -1,5 +1,6 @@
 package com.sportreserve.payment;
 
+import lombok.Getter;
 import tools.jackson.databind.ObjectMapper;
 import com.sportreserve.exception.BusinessException;
 import com.sportreserve.notification.EmailService;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class RedsysService {
 
     private final String merchantCode;
+    @Getter
     private final String terminal;
     private final String secretKey;
     private final String currency;
@@ -85,6 +87,13 @@ public class RedsysService {
         params.put("DS_MERCHANT_MERCHANTNAME", merchantName);
         params.put("DS_MERCHANT_TITULAR", reservation.getCustomerName());
         params.put("DS_MERCHANT_PRODUCTDESCRIPTION", "Reserva: " + reservation.getCourt().getName());
+        if (reservation.getPaymentMethod() == PaymentMethod.BIZUM) {
+            params.put("DS_MERCHANT_PAYMETHODS", "z");
+            String bizumPhone = normalizeBizumPhone(reservation.getCustomerPhone());
+            if (!bizumPhone.isBlank()) {
+                params.put("DS_MERCHANT_BIZUM_MOBILENUMBER", bizumPhone);
+            }
+        }
 
         try {
             String jsonParams = objectMapper.writeValueAsString(params);
@@ -228,9 +237,22 @@ public class RedsysService {
         return signature == null ? "" : signature.replace('+', '-').replace('/', '_').replace("=", "");
     }
 
-    public String getTerminal() {
-        return terminal;
+    private String normalizeBizumPhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+        String digits = phone.replaceAll("\\D", "");
+        if (digits.startsWith("0034") && digits.length() == 13) {
+            return digits.substring(2);
+        }
+        if (digits.startsWith("34") && digits.length() == 11) {
+            return digits;
+        }
+        if (digits.length() == 9) {
+            return "34" + digits;
+        }
+        return digits;
     }
 
-    public record PaymentConfirmResult(boolean success, String order, String transactionId) {}
+  public record PaymentConfirmResult(boolean success, String order, String transactionId) {}
 }

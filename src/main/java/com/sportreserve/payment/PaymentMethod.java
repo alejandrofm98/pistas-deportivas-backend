@@ -1,5 +1,5 @@
 package com.sportreserve.payment;
 
 public enum PaymentMethod {
-    ONLINE, ONSITE
+    ONLINE, BIZUM, ONSITE
 }

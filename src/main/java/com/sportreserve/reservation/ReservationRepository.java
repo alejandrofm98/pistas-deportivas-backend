@@ -17,4 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.court.id = :courtId")
     long countByCourtId(@Param("courtId") UUID courtId);
+
+    @Query("SELECT r FROM Reservation r WHERE r.status = 'PENDING_PAYMENT' AND r.createdAt < :cutoff")
+    List<Reservation> findStalePendingReservations(@Param("cutoff") java.time.LocalDateTime cutoff);
 }

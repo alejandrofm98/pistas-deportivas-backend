@@ -86,12 +86,10 @@ public class ReservationService {
         reservation.setTotalPrice(totalPrice);
         reservation.setPaymentMethod(request.paymentMethod());
         reservation.setPaymentStatus(PaymentStatus.PENDING);
-        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservation.setStatus(ReservationStatus.PENDING_PAYMENT);
         reservation.setCreatedAt(LocalDateTime.now());
 
         reservation = reservationRepository.save(reservation);
-
-        emailService.sendReservationConfirmation(reservation);
 
         return reservationMapper.toResponse(reservation);
     }

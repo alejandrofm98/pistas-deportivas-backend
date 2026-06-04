@@ -2,6 +2,7 @@ package com.sportreserve.payment;
 
 import tools.jackson.databind.ObjectMapper;
 import com.sportreserve.exception.BusinessException;
+import com.sportreserve.notification.EmailService;
 import com.sportreserve.payment.dto.PaymentInitiateResponse;
 import com.sportreserve.reservation.Reservation;
 import com.sportreserve.reservation.ReservationRepository;
@@ -26,6 +27,7 @@ public class RedsysService {
     private final String merchantReturnUrl;
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
+    private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
     private static final String DS_SIGNATURE_VERSION = "HMAC_SHA256_V1";
@@ -40,6 +42,7 @@ public class RedsysService {
         @Value("${app.redsys.notify-url}") String notifyUrl,
         PaymentRepository paymentRepository,
         ReservationRepository reservationRepository,
+        EmailService emailService,
         ObjectMapper objectMapper) {
         this.merchantCode = merchantCode;
         this.terminal = terminal;
@@ -49,6 +52,7 @@ public class RedsysService {
         this.merchantReturnUrl = merchantReturnUrl;
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
+        this.emailService = emailService;
         this.objectMapper = objectMapper;
     }
 
@@ -120,7 +124,11 @@ public class RedsysService {
                 || "0".equals(responseCode)) {
                 payment.setStatus(PaymentStatus.PAID);
                 payment.setRedsysTransactionId(transactionId);
-                payment.getReservation().setPaymentStatus(PaymentStatus.PAID);
+                Reservation reservation = payment.getReservation();
+                reservation.setPaymentStatus(PaymentStatus.PAID);
+                reservation.setStatus(com.sportreserve.reservation.ReservationStatus.CONFIRMED);
+                reservationRepository.save(reservation);
+                emailService.sendReservationConfirmation(reservation);
             } else {
                 payment.setStatus(PaymentStatus.FAILED);
             }
@@ -128,7 +136,6 @@ public class RedsysService {
             payment.setRedsysResponseCode(responseCode);
             payment.setUpdatedAt(LocalDateTime.now());
             paymentRepository.save(payment);
-            reservationRepository.save(payment.getReservation());
 
         } catch (Exception e) {
             throw new BusinessException("Failed to process Redsys notification: " + e.getMessage());

@@ -1,5 +1,7 @@
 package com.sportreserve.payment;
 
+import com.sportreserve.payment.dto.PaymentConfirmRequest;
+import com.sportreserve.payment.dto.PaymentConfirmResponse;
 import com.sportreserve.payment.dto.PaymentInitiateRequest;
 import com.sportreserve.payment.dto.PaymentInitiateResponse;
 import com.sportreserve.payment.dto.PaymentResponse;
@@ -40,6 +42,15 @@ public class PaymentController {
         String signature = body.get("Ds_Signature");
         paymentService.handleRedsysNotification(merchantParameters, signature);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<PaymentConfirmResponse> confirm(
+            @Valid @RequestBody PaymentConfirmRequest request) {
+        RedsysService.PaymentConfirmResult result = paymentService.confirmPayment(
+            request.dsMerchantParameters(), request.dsSignature());
+        return ResponseEntity.ok(new PaymentConfirmResponse(
+            result.success(), result.order(), result.transactionId()));
     }
 
     @GetMapping("/{id}")

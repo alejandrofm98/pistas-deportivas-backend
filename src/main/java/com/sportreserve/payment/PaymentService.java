@@ -59,6 +59,11 @@ public class PaymentService {
     }
 
     @Transactional
+    public RedsysService.PaymentConfirmResult confirmPayment(String merchantParameters, String signature) {
+        return redsysService.confirmPayment(merchantParameters, signature);
+    }
+
+    @Transactional
     public void handleRedsysNotification(String merchantParameters, String signature) {
         redsysService.processNotification(merchantParameters, signature);
     }
@@ -76,7 +81,9 @@ public class PaymentService {
     }
 
     private String generateOrderId(Reservation reservation) {
-        return System.currentTimeMillis() + "-" + reservation.getId().toString().substring(0, 8);
+        String term = String.format("%04d", Integer.parseInt(redsysService.getTerminal()));
+        String ref = reservation.getId().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return term + ref;
     }
 
     private PaymentResponse toResponse(Payment payment) {

@@ -1,15 +1,16 @@
 package com.sportreserve.payment;
 
+import lombok.Getter;
 import tools.jackson.databind.ObjectMapper;
 import com.sportreserve.exception.BusinessException;
+import com.sportreserve.notification.EmailService;
 import com.sportreserve.payment.dto.PaymentInitiateResponse;
 import com.sportreserve.reservation.Reservation;
 import com.sportreserve.reservation.ReservationRepository;
-import com.sportreserve.reservation.ReservationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import javax.crypto.Mac;
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.RoundingMode;
@@ -19,12 +20,12 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class RedsysService {
 
     private final String merchantCode;
+    @Getter
     private final String terminal;
     private final String secretKey;
     private final String currency;
@@ -34,7 +35,7 @@ public class RedsysService {
     private final String notifyUrl;
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
-    private final ReservationService reservationService;
+    private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
     private static final String DS_SIGNATURE_VERSION = "HMAC_SHA256_V1";
@@ -50,7 +51,7 @@ public class RedsysService {
         @Value("${app.redsys.notify-url}") String notifyUrl,
         PaymentRepository paymentRepository,
         ReservationRepository reservationRepository,
-        ReservationService reservationService,
+        EmailService emailService,
         ObjectMapper objectMapper) {
         this.merchantCode = merchantCode;
         this.terminal = terminal;
@@ -62,7 +63,7 @@ public class RedsysService {
         this.notifyUrl = notifyUrl;
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
-        this.reservationService = reservationService;
+        this.emailService = emailService;
         this.objectMapper = objectMapper;
     }
 
@@ -122,15 +123,15 @@ public class RedsysService {
 
     private PaymentConfirmResult processPaymentResult(String merchantParameters, String signature) {
         try {
+            if (!verifySignature(merchantParameters, signature)) {
+                throw new BusinessException("Invalid Redsys signature");
+            }
+
             Map<String, String> params = decodeMerchantParameters(merchantParameters);
 
             String order = getParam(params, "Ds_Order");
             String responseCode = getParam(params, "Ds_Response");
             String transactionId = getParam(params, "Ds_AuthorisationCode");
-
-            if (!verifySignature(merchantParameters, signature)) {
-                throw new BusinessException("Invalid Redsys signature for order: " + order);
-            }
 
             Payment payment = paymentRepository.findByRedsysOrder(order)
                 .orElseThrow(() -> new BusinessException("Payment not found for order: " + order));
@@ -141,23 +142,19 @@ public class RedsysService {
                 payment.setStatus(PaymentStatus.PAID);
                 payment.setRedsysTransactionId(transactionId);
                 payment.setRedsysResponseCode(responseCode);
-                payment.setUpdatedAt(LocalDateTime.now());
-                paymentRepository.save(payment);
 
-                Reservation paymentReservation = payment.getReservation();
-                paymentReservation.setPaymentStatus(PaymentStatus.PAID);
-                reservationRepository.save(paymentReservation);
-
-                UUID bookingGroup = paymentReservation.getBookingGroup();
-                if (bookingGroup != null) {
-                    reservationService.confirmByBookingGroup(bookingGroup, transactionId);
-                }
+                Reservation reservation = payment.getReservation();
+                reservation.setPaymentStatus(PaymentStatus.PAID);
+                reservation.setStatus(com.sportreserve.reservation.ReservationStatus.CONFIRMED);
+                reservationRepository.save(reservation);
+                emailService.sendReservationConfirmation(reservation);
             } else {
                 payment.setStatus(PaymentStatus.FAILED);
                 payment.setRedsysResponseCode(responseCode);
-                payment.setUpdatedAt(LocalDateTime.now());
-                paymentRepository.save(payment);
             }
+
+            payment.setUpdatedAt(LocalDateTime.now());
+            paymentRepository.save(payment);
 
             return new PaymentConfirmResult(success, order, transactionId);
         } catch (Exception e) {
@@ -165,12 +162,11 @@ public class RedsysService {
         }
     }
 
-    public boolean verifySignature(String merchantParameters, String signature) {
+    private boolean verifySignature(String merchantParameters, String signature) {
         try {
             Map<String, String> params = decodeMerchantParameters(merchantParameters);
             String order = getParam(params, "Ds_Order");
             String expectedSignature = createSignature(merchantParameters, order);
-
             return normalizeSignature(expectedSignature).equals(normalizeSignature(signature));
         } catch (Exception e) {
             return false;
@@ -258,9 +254,5 @@ public class RedsysService {
         return digits;
     }
 
-    public String getTerminal() {
-        return terminal;
-    }
-
-    public record PaymentConfirmResult(boolean success, String order, String transactionId) {}
+  public record PaymentConfirmResult(boolean success, String order, String transactionId) {}
 }

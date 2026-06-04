@@ -32,6 +32,9 @@ services:
       - MAIL_PASSWORD
       - BREVO_API_KEY
       - BREVO_SENDER_EMAIL
+      - APP_URL
+      - API_URL
+      - CORS_ORIGINS
     volumes:
       - uploads_data:/app/uploads
     networks:

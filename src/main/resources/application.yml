@@ -1,7 +1,8 @@
-server:
-  port: 8080
-
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
   application:
     name: pistas-deportivas-backend
   datasource:
@@ -11,19 +12,10 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: false
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:db/seed.sql
-  flyway:
-    enabled: false
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -35,8 +27,9 @@ spring:
           auth: ${MAIL_USERNAME:false}
           starttls:
             enable: ${MAIL_USERNAME:false}
-
 app:
+  upload:
+    dir: ${UPLOAD_DIR:./uploads}
   admin:
     username: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin123}
@@ -47,14 +40,19 @@ app:
     merchant-code: ${REDSYS_MERCHANT_CODE:999008881}
     terminal: ${REDSYS_TERMINAL:1}
     secret-key: ${REDSYS_SECRET_KEY:sq7HjrUOBfKmC576ILgskD5srU870gJ7}
+    currency: ${REDSYS_CURRENCY:978}
     url: ${REDSYS_URL:https://sis-t.redsys.es:25443/sis/realizarPago}
     merchant-name: PistasDeportivas
     merchant-return-url: ${APP_URL:http://localhost:4200}/payment/result
     notify-url: ${API_URL:http://localhost:8080}/api/payments/notify
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
-
+  brevo:
+    api-key: ${BREVO_API_KEY:}
+    sender-name: Pistas El Valle Perdido
+    sender-email: ${BREVO_SENDER_EMAIL:}
 logging:
   level:
     com.sportreserve: DEBUG
     org.springframework.security: INFO
+    org.flywaydb: DEBUG

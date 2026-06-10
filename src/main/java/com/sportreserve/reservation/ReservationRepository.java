@@ -9,11 +9,15 @@ import java.util.UUID;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
 
-    List<Reservation> findByCustomerEmailOrderByDateDesc(String email);
-
     @Query("SELECT r FROM Reservation r WHERE r.court.id = :courtId AND r.date = :date AND r.status <> 'CANCELLED'")
     List<Reservation> findActiveByCourtAndDate(@Param("courtId") UUID courtId, @Param("date") LocalDate date);
 
     @Query("SELECT r FROM Reservation r WHERE r.date < :today AND r.status = 'CONFIRMED'")
     List<Reservation> findConfirmedBeforeDate(@Param("today") LocalDate today);
+
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.court.id = :courtId")
+    long countByCourtId(@Param("courtId") UUID courtId);
+
+    @Query("SELECT r FROM Reservation r WHERE r.status = 'PENDING_PAYMENT' AND r.createdAt < :cutoff")
+    List<Reservation> findStalePendingReservations(@Param("cutoff") java.time.LocalDateTime cutoff);
 }

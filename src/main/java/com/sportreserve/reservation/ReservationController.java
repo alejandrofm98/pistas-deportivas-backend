@@ -2,6 +2,7 @@ package com.sportreserve.reservation;
 
 import com.sportreserve.reservation.dto.ReservationRequest;
 import com.sportreserve.reservation.dto.ReservationResponse;
+import com.sportreserve.payment.PaymentStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +31,6 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<List<ReservationResponse>> getByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(reservationService.findByEmail(email));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(reservationService.findById(id));
@@ -50,5 +46,13 @@ public class ReservationController {
             @PathVariable UUID id,
             @RequestParam ReservationStatus status) {
         return ResponseEntity.ok(reservationService.updateStatus(id, status));
+    }
+
+    @PatchMapping("/{id}/payment-status")
+    public ResponseEntity<Void> updatePaymentStatus(
+            @PathVariable UUID id,
+            @RequestParam PaymentStatus paymentStatus) {
+        reservationService.updatePaymentStatus(id, paymentStatus);
+        return ResponseEntity.ok().build();
     }
 }

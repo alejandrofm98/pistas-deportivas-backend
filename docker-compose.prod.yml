@@ -1,0 +1,50 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pistas-backend.rule=Host(`api.pistasvalleperdido.es`)"
+      - "traefik.http.routers.pistas-backend.entrypoints=websecure"
+      - "traefik.http.routers.pistas-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pistas-backend.loadbalancer.server.port=8080"
+    environment:
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - JWT_SECRET
+      - ADMIN_USERNAME
+      - ADMIN_PASSWORD
+      - REDSYS_MERCHANT_CODE
+      - REDSYS_TERMINAL
+      - REDSYS_SECRET_KEY
+      - REDSYS_CURRENCY
+      - REDSYS_URL
+      - REDSYS_MERCHANT_URL
+      - APP_URL
+      - API_URL
+      - CORS_ORIGINS
+      - MAIL_HOST
+      - MAIL_PORT
+      - MAIL_USERNAME
+      - MAIL_PASSWORD
+      - BREVO_API_KEY
+      - BREVO_SENDER_EMAIL
+      - APP_URL
+      - API_URL
+      - CORS_ORIGINS
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - default
+      - dokploy-network
+
+volumes:
+  uploads_data:
+
+networks:
+  default: {}
+  dokploy-network:
+    external: true

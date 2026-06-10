@@ -7,5 +7,5 @@ public record AvailabilityResponse(
     LocalDate date,
     List<TimeSlot> slots
 ) {
-    public record TimeSlot(int hour, boolean available) {}
+    public record TimeSlot(Double time, boolean available) {}
 }

@@ -51,11 +51,15 @@ public class PaymentService {
             newPayment.setCreatedAt(LocalDateTime.now());
             return newPayment;
         });
-
         payment.setRedsysOrder(generateOrderId(reservation));
         payment = paymentRepository.save(payment);
 
         return redsysService.createPaymentRequest(payment);
+    }
+
+    @Transactional
+    public RedsysService.PaymentConfirmResult confirmPayment(String merchantParameters, String signature) {
+        return redsysService.confirmPayment(merchantParameters, signature);
     }
 
     @Transactional
@@ -76,7 +80,9 @@ public class PaymentService {
     }
 
     private String generateOrderId(Reservation reservation) {
-        return System.currentTimeMillis() + "-" + reservation.getId().toString().substring(0, 8);
+        String term = String.format("%04d", Integer.parseInt(redsysService.getTerminal()));
+        String ref = reservation.getId().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return term + ref;
     }
 
     private PaymentResponse toResponse(Payment payment) {

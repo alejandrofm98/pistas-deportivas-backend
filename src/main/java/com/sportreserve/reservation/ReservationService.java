@@ -85,6 +85,7 @@ public class ReservationService {
         reservation.setEndTime(endTime);
         reservation.setTotalPrice(totalPrice);
         reservation.setPaymentMethod(request.paymentMethod());
+        reservation.setBookingGroup(request.bookingGroup());
         reservation.setPaymentStatus(PaymentStatus.PENDING);
         reservation.setStatus(ReservationStatus.PENDING_PAYMENT);
         reservation.setCreatedAt(LocalDateTime.now());

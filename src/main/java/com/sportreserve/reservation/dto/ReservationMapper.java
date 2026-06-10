@@ -26,6 +26,7 @@ public class ReservationMapper {
             reservation.getTotalPrice(),
             reservation.getPaymentMethod(),
             reservation.getPaymentStatus(),
+            reservation.getBookingGroup(),
             reservation.getStatus(),
             reservation.getCreatedAt()
         );

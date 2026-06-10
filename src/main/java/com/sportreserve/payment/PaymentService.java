@@ -8,6 +8,7 @@ import com.sportreserve.reservation.ReservationRepository;
 import com.sportreserve.reservation.ReservationStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -42,15 +43,28 @@ public class PaymentService {
             throw new BusinessException("Reservation is already paid");
         }
 
+        BigDecimal totalAmount;
+        {
+            UUID bookingGroup = reservation.getBookingGroup();
+            BigDecimal amount = reservation.getTotalPrice();
+            if (bookingGroup != null) {
+                amount = reservationRepository.findByBookingGroup(bookingGroup).stream()
+                    .map(Reservation::getTotalPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            }
+            totalAmount = amount;
+        }
+
         Payment payment = existingPayment.orElseGet(() -> {
             Payment newPayment = new Payment();
             newPayment.setReservation(reservation);
-            newPayment.setAmount(reservation.getTotalPrice());
+            newPayment.setAmount(totalAmount);
             newPayment.setRedsysOrder(generateOrderId(reservation));
             newPayment.setStatus(PaymentStatus.PENDING);
             newPayment.setCreatedAt(LocalDateTime.now());
             return newPayment;
         });
+        payment.setAmount(totalAmount);
         payment.setRedsysOrder(generateOrderId(reservation));
         payment = paymentRepository.save(payment);
 

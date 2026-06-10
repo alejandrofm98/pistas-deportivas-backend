@@ -148,6 +148,18 @@ public class RedsysService {
                 reservation.setStatus(com.sportreserve.reservation.ReservationStatus.CONFIRMED);
                 reservationRepository.save(reservation);
                 emailService.sendReservationConfirmation(reservation);
+
+                java.util.UUID bookingGroup = reservation.getBookingGroup();
+                if (bookingGroup != null) {
+                    reservationRepository.findByBookingGroup(bookingGroup).stream()
+                        .filter(r -> !r.getId().equals(reservation.getId()))
+                        .forEach(r -> {
+                            r.setPaymentStatus(PaymentStatus.PAID);
+                            r.setStatus(com.sportreserve.reservation.ReservationStatus.CONFIRMED);
+                            reservationRepository.save(r);
+                            emailService.sendReservationConfirmation(r);
+                        });
+                }
             } else {
                 payment.setStatus(PaymentStatus.FAILED);
                 payment.setRedsysResponseCode(responseCode);

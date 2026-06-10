@@ -51,6 +51,9 @@ public class Reservation {
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @Column(name = "booking_group")
+    private UUID bookingGroup;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.CONFIRMED;
@@ -82,6 +85,8 @@ public class Reservation {
     public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
     public PaymentStatus getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
+    public UUID getBookingGroup() { return bookingGroup; }
+    public void setBookingGroup(UUID bookingGroup) { this.bookingGroup = bookingGroup; }
     public ReservationStatus getStatus() { return status; }
     public void setStatus(ReservationStatus status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }

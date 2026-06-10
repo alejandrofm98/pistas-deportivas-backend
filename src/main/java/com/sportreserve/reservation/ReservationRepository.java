@@ -20,4 +20,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
 
     @Query("SELECT r FROM Reservation r WHERE r.status = 'PENDING_PAYMENT' AND r.createdAt < :cutoff")
     List<Reservation> findStalePendingReservations(@Param("cutoff") java.time.LocalDateTime cutoff);
+
+    @Query("SELECT r FROM Reservation r WHERE r.bookingGroup = :bookingGroup")
+    List<Reservation> findByBookingGroup(@Param("bookingGroup") UUID bookingGroup);
 }

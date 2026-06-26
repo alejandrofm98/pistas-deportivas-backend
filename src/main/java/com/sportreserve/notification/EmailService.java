@@ -1,6 +1,7 @@
 package com.sportreserve.notification;
 
 import com.sportreserve.reservation.Reservation;
+import com.sportreserve.settings.AppSettingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import brevo.auth.ApiKeyAuth;
 import brevoApi.TransactionalEmailsApi;
 import brevoModel.CreateSmtpEmail;
 import brevoModel.SendSmtpEmail;
+import brevoModel.SendSmtpEmailBcc;
 import brevoModel.SendSmtpEmailSender;
 import brevoModel.SendSmtpEmailTo;
 
@@ -21,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class EmailService {
@@ -29,13 +32,16 @@ public class EmailService {
     private static final DateTimeFormatter SPANISH_DATE =
         DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", Locale.forLanguageTag("es-ES"));
 
+    private final AppSettingRepository appSettingRepository;
     private final String apiKey;
     private final String senderName;
     private final String senderEmail;
 
-    public EmailService(@Value("${app.brevo.api-key:}") String apiKey,
+    public EmailService(AppSettingRepository appSettingRepository,
+                        @Value("${app.brevo.api-key:}") String apiKey,
                         @Value("${app.brevo.sender-name:Pistas El Valle}") String senderName,
                         @Value("${app.brevo.sender-email:}") String senderEmail) {
+        this.appSettingRepository = appSettingRepository;
         this.apiKey = apiKey;
         this.senderName = senderName;
         this.senderEmail = senderEmail;
@@ -71,6 +77,20 @@ public class EmailService {
             email.setTo(List.of(new SendSmtpEmailTo().email(to)));
             email.setSubject(subject);
             email.setHtmlContent(htmlContent);
+
+            String bccValue = appSettingRepository.findById("email_bcc")
+                .map(s -> s.getSettingValue())
+                .orElse("");
+            if (!bccValue.isBlank()) {
+                List<SendSmtpEmailBcc> bccList = java.util.Arrays.stream(bccValue.split(","))
+                    .map(String::trim)
+                    .filter(addr -> !addr.isEmpty())
+                    .map(addr -> new SendSmtpEmailBcc().email(addr))
+                    .collect(Collectors.toList());
+                if (!bccList.isEmpty()) {
+                    email.setBcc(bccList);
+                }
+            }
 
             TransactionalEmailsApi api = new TransactionalEmailsApi(client);
             CreateSmtpEmail response = api.sendTransacEmail(email);

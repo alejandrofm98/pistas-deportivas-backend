@@ -129,7 +129,6 @@ public class EmailService {
         return switch (method) {
             case ONLINE -> "Online (tarjeta)";
             case BIZUM -> "Bizum";
-            case ONSITE -> "Pago en local";
         };
     }
 

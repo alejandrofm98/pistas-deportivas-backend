@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pistas El Valle Perdido &middot; API</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+            background: #f4f6f9;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem 3rem;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #16213e;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 0.25rem;
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: #e6f7e6;
+            color: #1b7a1b;
+        }
+
+        .note {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .divider {
+            margin: 1.25rem 0;
+            border: none;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .footer {
+            font-size: 0.75rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Pistas El Valle Perdido</h1>
+        <div class="status">API operativa</div>
+        <hr class="divider">
+        <p class="note">
+            Endpoints disponibles bajo <code>/api/</code>.
+            <br>
+            Consulte la documentacion para mas informacion.
+        </p>
+        <p class="footer">Pistas Deportivas Backend</p>
+    </div>
+</body>
+</html>
